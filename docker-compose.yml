@@ -1,0 +1,34 @@
+services:
+  db:
+    image: postgres:14
+    container_name: my_postgres
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: mydb
+    ports:
+      - "5433:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - bot_network
+
+  bot:
+    build: .
+    container_name: my_bot
+    # Переменные окружения внутри контейнера бота
+    environment:
+      # Берём строку подключения к базе
+      DATABASE_URL: "postgresql://myuser:mypassword@db:5432/mydb"
+      TELEGRAM_BOT_TOKEN: "7785832146:AAF_1uw0rmmskx0_Gx9uerPmA9rd23rLaWk"
+    depends_on:
+      - db
+    networks:
+      - bot_network
+
+volumes:
+  db_data:
+
+networks:
+  bot_network:
+    driver: bridge
